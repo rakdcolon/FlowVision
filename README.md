@@ -1,5 +1,7 @@
 # Flow Vision
 
+This repository holds the FlowVision project, a computer vision software.
+
 ## Table of Contents
 
 - [Requirements](#requirements)
@@ -41,7 +43,7 @@
     pip install -r requirements.txt
     ```
 
-    *Note: Ensure you have a `requirements.txt` file in your repository containing:*
+    *Note: Ensure you have a [requirements.txt](requirements.txt) file in your repository.
 
 ## License
 
