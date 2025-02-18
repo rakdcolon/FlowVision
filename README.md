@@ -11,7 +11,7 @@
 - **Python 3.7+**  
   Download and install Python from [python.org](https://www.python.org/downloads/).
 
-- **pip**  
+- **Pip**  
   The Python package installer (usually included with Python).
 
 ## Setup
@@ -19,8 +19,8 @@
 1. **Clone the Repository**
 
     ```bash
-    git clone <repository-url>
-    cd <repository-folder>
+    git clone https://github.com/rakdcolon/FlowVision
+    cd FlowVision
     ```
 
 2. **Create a Virtual Environment (Optional but Recommended)**
