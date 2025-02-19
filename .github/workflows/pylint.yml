@@ -1,0 +1,32 @@
+name: Lint Python Code
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]  # Change or add versions if needed
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Upgrade pip and install pylint
+        run: |
+          python -m pip install --upgrade pip
+          pip install pylint
+
+      - name: Lint Python files with pylint
+        run: |
+          # If you have a custom configuration file (e.g., .pylintrc), pylint will pick it up automatically.
+          # This command lints all tracked Python files in your repository.
+          pylint $(git ls-files '*.py')
