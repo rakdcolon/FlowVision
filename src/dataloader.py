@@ -43,8 +43,9 @@ class UADETRACDataset( # Custom dataset for the UA-DETRAC object detection datas
         )   ->     dict:   # A dictionary containing the image, bounding boxes, and image filename
 
         # Get image path and corresponding label path
-        image_path = os.path.join(self.images_dir, self.image_files[idx])
-        label_path = os.path.join(self.labels_dir, os.path.splitext(self.image_files[idx])[0] + ".txt")
+        image_filename = self.image_files[idx]
+        image_path = os.path.join(self.images_dir, image_filename)
+        label_path = os.path.join(self.labels_dir, os.path.splitext(image_filename)[0] + ".txt")
 
         # Load image and apply transformation to RGB format
         image = Image.open(image_path).convert("RGB")
