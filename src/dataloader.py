@@ -4,11 +4,10 @@
 # Description : This file contains the custom dataset and dataloader for the UA-DETRAC object detection dataset.
 
 # Import necessary libraries
-import torch
 import os
 from PIL import Image
+import torch
 from torch.utils.data import Dataset, DataLoader
-import torch.utils.data.distributed
 import torchvision.transforms as transforms
 
 class UADETRACDataset( # Custom dataset for the UA-DETRAC object detection dataset.
@@ -64,7 +63,7 @@ class UADETRACDataset( # Custom dataset for the UA-DETRAC object detection datas
         bounding_boxes = []
         try:
             with open(label_path, "r") as label_file: # Open the label file
-                for line in label_file: # Each line contains the class label and bounding box coordinates (class, x, y, width, height)
+                for line in label_file: # Each line contains the tuple: (class, x, y, width, height)
                     parts = line.strip().split()
 
                     if len(parts) != 5: # Check if the label format is valid
@@ -150,12 +149,12 @@ if __name__ == "__main__":
 
     # Print out one batch of training data
     for batch in train_loader:
-        images         = batch["image"]
-        bounding_boxes = batch["bounding_boxes"]
-        filenames      = batch["image_filename"]
+        images    = batch["image"]
+        bboxes    = batch["bounding_boxes"]
+        filenames = batch["image_filename"]
         print(f"Batch size         : {images.size(0)}")
         print(f"Image tensor shape : {images.shape}")
-        print(f"Bounding boxes     : \n{bounding_boxes}")
+        print(f"Bounding boxes     : \n{bboxes}")
         break # Break after the first batch for demonstration purposes
 
     print("Training Data Loaded.")

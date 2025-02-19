@@ -8,6 +8,7 @@ on:
 
 jobs:
   lint:
+    name: Linting Python Files
     runs-on: ubuntu-latest
     strategy:
       matrix:
