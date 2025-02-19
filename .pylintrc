@@ -12,6 +12,8 @@ ignore=.venv,build,dist
 # - missing-class-docstring / missing-function-docstring: You may use inline comments for documentation.
 # - invalid-name: Allow variable names if they conform to your own conventions.
 disable=
+    trailing-newlines,
+    trailing-whitespace,
     missing-module-docstring,
     missing-class-docstring,
     missing-function-docstring,
