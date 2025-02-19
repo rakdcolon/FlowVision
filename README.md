@@ -10,7 +10,7 @@ This repository holds the FlowVision project, a computer vision software.
 
 ## Requirements
 
-- **Python 3.7+**  
+- **Python 3.8+**  
   Download and install Python from [python.org](https://www.python.org/downloads/).
 
 - **Pip**  
