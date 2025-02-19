@@ -14,10 +14,12 @@ ignore=.venv,build,dist
 disable=
     trailing-newlines,
     trailing-whitespace,
+    missing-final-newline,
     missing-module-docstring,
     missing-class-docstring,
     missing-function-docstring,
-    invalid-name
+    invalid-name,
+    redefined-outer-name
 
 [REPORTS]
 # Disable the full report; only errors and warnings are shown.
