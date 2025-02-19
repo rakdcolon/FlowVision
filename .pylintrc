@@ -1,0 +1,63 @@
+# .pylintrc
+# This configuration file is tailored to the strict formatting style
+# used in your repository. Adjust the options below as needed.
+
+[MASTER]
+# Specify files or directories to be ignored (e.g., virtual environments, build directories)
+ignore=.venv,build,dist
+
+[MESSAGES CONTROL]
+# Disable some warnings to align with your style:
+# - missing-module-docstring: You provide header comments instead of a module docstring.
+# - missing-class-docstring / missing-function-docstring: You may use inline comments for documentation.
+# - invalid-name: Allow variable names if they conform to your own conventions.
+disable=
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    invalid-name
+
+[REPORTS]
+# Disable the full report; only errors and warnings are shown.
+reports=no
+
+[FORMAT]
+# Maximum number of characters on a single line.
+max-line-length=127
+
+# String used as indentation unit.
+indent-string='    '
+
+# Expected format of line endings, 'LF' for Linux/macOS.
+expected-line-ending-format=LF
+
+[DESIGN]
+# Maximum number of arguments for a function/method.
+max-args=10
+
+# Maximum number of local variables in a function.
+max-locals=15
+
+# Maximum number of return statements in a function.
+max-returns=6
+
+[TYPECHECK]
+# If you are using libraries that generate members dynamically (e.g., torch, PIL),
+# you can tell pylint to ignore these.
+generated-members=torch.*,PIL.*
+
+[SIMILARITIES]
+# Minimum number of lines of a similarity to be flagged.
+min-similarity-lines=4
+
+[VARIABLES]
+# Good variable names which do not trigger warnings.
+good-names=i,j,k,ex,Run,_
+
+[LOGGING]
+# Format style for logging messages.
+logging-format-style=old
+
+[STRING]
+# Allow both single and double quotes.
+string-quote=single
