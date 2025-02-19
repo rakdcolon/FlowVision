@@ -8,6 +8,7 @@ import torch
 import os
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
+import torch.utils.data.distributed
 import torchvision.transforms as transforms
 
 class UADETRACDataset( # Custom dataset for the UA-DETRAC object detection dataset.
@@ -109,33 +110,26 @@ def get_dataloader(                  # Creates a DataLoader for the UA-DETRAC da
         images_folder : str,         # Path to folder containing images
         labels_folder : str,         # Path to folder containing labels
         batch_size    : int  = 16,   # Number of samples per batch
-        shuffle       : bool = True, # Whether to shuffle the data
-        distributed   : bool = False # Whether to use a DistributedSampler for multi-node training
+        shuffle       : bool = True, # Whether to shuffle the dataset
     )   ->              DataLoader:  # Configured PyTorch DataLoader
 
-    # Define a simple transformation to convert images to tensors
+    # Define the transformation to apply to the images
     transform = transforms.Compose([
-        transforms.ToTensor(),
+        transforms.ToTensor(), # Convert image to tensor
         # Add other transformations here
     ])
 
     # Create the dataset
     dataset = UADETRACDataset(images_folder, labels_folder, transform=transform)
-
-    # Use a DistributedSampler for multi-node training
-    sampler = None
-    if distributed:
-        sampler = torch.utils.data.distributed.DistributedSampler(dataset)
     
     # Create the DataLoader
     dataloader = DataLoader(
-        dataset,
-        batch_size  = batch_size,
-        shuffle     = (sampler is None) and shuffle, # Disable shuffling if using a sampler
-        collate_fn  = custom_collate,                # Use custom collate function to handle variable-size bounding boxes
-        num_workers = os.cpu_count(),                # Use as many workers as there are cores
-        pin_memory  = True,                          # Enable faster host-to-device transfer
-        sampler     = sampler
+        dataset,                      # The dataset to load
+        batch_size  = batch_size,     # Number of samples per batch
+        shuffle     = shuffle,        # Disable shuffling if using a sampler
+        collate_fn  = custom_collate, # Use custom collate function to handle variable-size bounding boxes
+        num_workers = os.cpu_count(), # Use as many workers as there are cores
+        pin_memory  = True,           # Enable faster host-to-device transfer
     )
     
     # Return the DataLoader
@@ -149,8 +143,8 @@ if __name__ == "__main__":
     val_labels_dir   = "./data/labels/val"   # Path to the validation labels
 
     # Create dataloaders for training and validation
-    train_loader = get_dataloader(train_images_dir, train_labels_dir, batch_size=16, shuffle=True,  distributed=False)
-    val_loader   = get_dataloader(val_images_dir,   val_labels_dir,   batch_size=16, shuffle=False, distributed=False)
+    train_loader = get_dataloader(train_images_dir, train_labels_dir, batch_size=16, shuffle=True)
+    val_loader   = get_dataloader(val_images_dir,   val_labels_dir,   batch_size=16, shuffle=False)
 
     print("\nLoading Training Data...")
 
