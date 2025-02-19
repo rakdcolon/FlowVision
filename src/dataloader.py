@@ -8,7 +8,7 @@ import os
 from PIL import Image
 import torch
 from torch.utils.data import Dataset, DataLoader
-import torchvision.transforms as transforms
+from torchvision import transforms
 
 class UADETRACDataset( # Custom dataset for the UA-DETRAC object detection dataset.
             Dataset    # Extends the PyTorch Dataset class
@@ -30,25 +30,21 @@ class UADETRACDataset( # Custom dataset for the UA-DETRAC object detection datas
 
         if len(self.image_files) == 0:
             raise FileNotFoundError(f"No images found in {images_dir}")
-        
+
     def __len__(          # Gets the number of images in the dataset.
             self : object # Instance of the class
         )   ->     int:   # The number of images in the dataset
 
         return len(self.image_files)
-    
+
     def __getitem__(       # Gets an image and its bounding boxes from the dataset.
             self : object, # Instance of the class
             idx  : int     # Index of the image to retrieve
         )   ->     dict:   # A dictionary containing the image, bounding boxes, and image filename
 
         # Get image path and corresponding label path
-        image_filename = self.image_files[idx]
-        image_path = os.path.join(self.images_dir, image_filename)
-
-        # Assumes the label file has the same base name as the image, but with a .txt extension
-        label_filename = os.path.splitext(image_filename)[0] + ".txt"
-        label_path = os.path.join(self.labels_dir, label_filename)
+        image_path = os.path.join(self.images_dir, self.image_files[idx])
+        label_path = os.path.join(self.labels_dir, os.path.splitext(self.image_files[idx])[0] + ".txt")
 
         # Load image and apply transformation to RGB format
         image = Image.open(image_path).convert("RGB")
@@ -62,19 +58,19 @@ class UADETRACDataset( # Custom dataset for the UA-DETRAC object detection datas
         # Read bounding boxes from the label file
         bounding_boxes = []
         try:
-            with open(label_path, "r") as label_file: # Open the label file
+            with open(label_path, "r", encoding="utf-8") as label_file: # Open the label file with utf-8 encoding
                 for line in label_file: # Each line contains the tuple: (class, x, y, width, height)
                     parts = line.strip().split()
 
                     if len(parts) != 5: # Check if the label format is valid
                         return ValueError(f"Invalid label format in {label_path}")
-                    
+
                     # Only take the coordinates (x, y, width, height) and convert to float
                     x, y, width, height = map(float, parts[1:])
                     bounding_boxes.append([x, y, width, height])
         except FileNotFoundError: # If the corresponding label file is not found
             bounding_boxes = []   # Set bounding boxes to an empty list
-        
+
         # Convert bounding boxes to a tensor; if no boxes, create an empty tensor with shape [0, 4]
         bounding_boxes = torch.tensor(bounding_boxes) if bounding_boxes else torch.zeros((0, 4))
 
@@ -92,13 +88,13 @@ def custom_collate(   # Custom collate function to handle variable-size bounding
 
     # Stack images (assumed to be the same shape)
     images = torch.stack([sample["image"] for sample in batch], dim=0)
-    
+
     # Keep bounding boxes as a list since they may have different sizes
     bounding_boxes = [sample["bounding_boxes"] for sample in batch]
-    
+
     # Collect filenames into a list
     image_filenames = [sample["image_filename"] for sample in batch]
-    
+
     return {
         "image"          : images,
         "bounding_boxes" : bounding_boxes,
@@ -120,7 +116,7 @@ def get_dataloader(                  # Creates a DataLoader for the UA-DETRAC da
 
     # Create the dataset
     dataset = UADETRACDataset(images_folder, labels_folder, transform=transform)
-    
+
     # Create the DataLoader
     dataloader = DataLoader(
         dataset,                      # The dataset to load
@@ -130,7 +126,7 @@ def get_dataloader(                  # Creates a DataLoader for the UA-DETRAC da
         num_workers = os.cpu_count(), # Use as many workers as there are cores
         pin_memory  = True,           # Enable faster host-to-device transfer
     )
-    
+
     # Return the DataLoader
     return dataloader
 
@@ -148,12 +144,12 @@ if __name__ == "__main__":
     print("\nLoading Training Data...")
 
     # Print out one batch of training data
-    for batch in train_loader:
-        images    = batch["image"]
-        bboxes    = batch["bounding_boxes"]
-        filenames = batch["image_filename"]
-        print(f"Batch size         : {images.size(0)}")
-        print(f"Image tensor shape : {images.shape}")
+    for example_batch in train_loader:
+        example_images = example_batch["image"]
+        bboxes         = example_batch["bounding_boxes"]
+        filenames      = example_batch["image_filename"]
+        print(f"Batch size         : {example_images.size(0)}")
+        print(f"Image tensor shape : {example_images.shape}")
         print(f"Bounding boxes     : \n{bboxes}")
         break # Break after the first batch for demonstration purposes
 
