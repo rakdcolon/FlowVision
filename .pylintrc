@@ -57,7 +57,3 @@ good-names=i,j,k,ex,Run,_
 [LOGGING]
 # Format style for logging messages.
 logging-format-style=old
-
-[STRING]
-# Allow both single and double quotes.
-string-quote=single
