@@ -3,12 +3,14 @@
 # Date        : Feburary 19th, 2025
 # Description : This file contains the custom dataset and dataloader for the UA-DETRAC object detection dataset.
 
-# Import necessary libraries
+# Built-in libraries
 import os
-from PIL import Image
+
+# Third-party libraries
 import torch
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
+from PIL import Image
 
 class UADETRACDataset( # Custom dataset for the UA-DETRAC object detection dataset.
             Dataset    # Extends the PyTorch Dataset class
@@ -87,10 +89,10 @@ def custom_collate(   # Custom collate function to handle variable-size bounding
         batch : list  # List of samples from the dataset
     )   ->      dict: # A dictionary containing the batched image, bounding boxes, and image filenames
 
-    # Stack images (assumed to be the same shape)
+    # Stack images 
     images = torch.stack([sample["image"] for sample in batch], dim=0)
 
-    # Keep bounding boxes as a list since they may have different sizes
+    # Keep bounding boxes as a list since they have different sizes
     bounding_boxes = [sample["bounding_boxes"] for sample in batch]
 
     # Collect filenames into a list
@@ -112,18 +114,17 @@ def get_dataloader(                  # Creates a DataLoader for the UA-DETRAC da
     # Define the transformation to apply to the images
     transform = transforms.Compose([
         transforms.ToTensor(), # Convert image to tensor
-        # Add other transformations here
     ])
 
     # Create the dataset
-    dataset = UADETRACDataset(images_folder, labels_folder, transform=transform)
+    dataset = UADETRACDataset(images_folder, labels_folder, transform = transform)
 
     # Create the DataLoader
     dataloader = DataLoader(
         dataset,                      # The dataset to load
         batch_size  = batch_size,     # Number of samples per batch
-        shuffle     = shuffle,        # Disable shuffling if using a sampler
-        collate_fn  = custom_collate, # Use custom collate function to handle variable-size bounding boxes
+        shuffle     = shuffle,        # Whether to shuffle the dataset
+        collate_fn  = custom_collate, # Custom collate function to handle variable-size bounding boxes
         num_workers = os.cpu_count(), # Use as many workers as there are cores
         pin_memory  = True,           # Enable faster host-to-device transfer
     )
@@ -131,16 +132,15 @@ def get_dataloader(                  # Creates a DataLoader for the UA-DETRAC da
     # Return the DataLoader
     return dataloader
 
-# Example usage
-if __name__ == "__main__":
+def main(): # Example usage
     train_images_dir = "./data/images/train" # Path to the training images
     train_labels_dir = "./data/labels/train" # Path to the training labels
     val_images_dir   = "./data/images/val"   # Path to the validation images
     val_labels_dir   = "./data/labels/val"   # Path to the validation labels
 
     # Create dataloaders for training and validation
-    train_loader = get_dataloader(train_images_dir, train_labels_dir, batch_size=16, shuffle=True)
-    val_loader   = get_dataloader(val_images_dir,   val_labels_dir,   batch_size=16, shuffle=False)
+    train_loader = get_dataloader(train_images_dir, train_labels_dir, batch_size=8, shuffle=True)
+    val_loader   = get_dataloader(val_images_dir,   val_labels_dir,   batch_size=8, shuffle=False)
 
     print("\nLoading Training Data...")
 
@@ -148,10 +148,23 @@ if __name__ == "__main__":
     for example_batch in train_loader:
         example_images = example_batch["image"]
         bboxes         = example_batch["bounding_boxes"]
-        filenames      = example_batch["image_filename"]
         print(f"Batch size         : {example_images.size(0)}")
         print(f"Image tensor shape : {example_images.shape}")
         print(f"Bounding boxes     : \n{bboxes}")
-        break # Break after the first batch for demonstration purposes
+        break # Break after the first batch
 
-    print("Training Data Loaded.")
+    print("Training Data Loaded." + "\n\n" + "Loading Validation Data...")
+
+    # Print out one batch of validation data
+    for example_batch in val_loader:
+        example_images = example_batch["image"]
+        bboxes         = example_batch["bounding_boxes"]
+        print(f"Batch size         : {example_images.size(0)}")
+        print(f"Image tensor shape : {example_images.shape}")
+        print(f"Bounding boxes     : \n{bboxes}")
+        break # Break after the first batch
+
+    print("Validation Data Loaded.")
+
+if __name__ == "__main__":
+    main()
